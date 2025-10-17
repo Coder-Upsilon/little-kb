@@ -1,6 +1,6 @@
-# VectorVault - Knowledge Base Management Webapp
+# VectorVault - Vector Storage & MCP Management Platform
 
-A Python-based webapp for managing multiple knowledge bases with vector storage and semantic search capabilities.
+A powerful web application for creating vector-indexed knowledge bases with automatic MCP server generation for seamless integration with AI tools like Cline.
 
 ## Features
 

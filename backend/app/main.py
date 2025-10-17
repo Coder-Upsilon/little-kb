@@ -9,7 +9,7 @@ os.makedirs("vector-db", exist_ok=True)
 
 app = FastAPI(
     title="VectorVault API",
-    description="Knowledge Base Management System with Vector Search",
+    description="Vector Storage & MCP Management Platform with Semantic Search",
     version="1.0.0"
 )
 

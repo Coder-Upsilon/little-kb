@@ -2,6 +2,7 @@
   "name": "vectorvault-frontend",
   "version": "0.1.0",
   "private": true,
+  "description": "Vector Storage & MCP Management Platform - Frontend",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
