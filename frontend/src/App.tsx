@@ -266,7 +266,7 @@ function App() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Little KB - Knowledge Base Manager
+            VectorVault - Knowledge Base Manager
           </Typography>
           {currentView !== 'list' && (
             <Button color="inherit" onClick={handleBackToList}>

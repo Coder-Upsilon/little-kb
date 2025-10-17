@@ -1,4 +1,4 @@
-# Little KB - Knowledge Base Management Webapp
+# VectorVault - Knowledge Base Management Webapp
 
 A Python-based webapp for managing multiple knowledge bases with vector storage and semantic search capabilities.
 
@@ -19,6 +19,14 @@ A Python-based webapp for managing multiple knowledge bases with vector storage 
 - **Frontend**: React with TypeScript and Material-UI
 - **Package Management**: uv for Python dependencies, npm for Node.js
 - **Vector Embeddings**: sentence-transformers for semantic search
+
+## Installation
+
+Clone the repository:
+```bash
+git clone https://github.com/Coder-Upsilon/VectorVault.git
+cd VectorVault
+```
 
 ## Quick Start
 
@@ -44,7 +52,7 @@ The application will be available at:
 ## Project Structure
 
 ```
-little-kb/
+VectorVault/
 ├── backend/           # FastAPI backend
 │   ├── app/
 │   │   ├── models/    # Pydantic schemas
@@ -61,7 +69,7 @@ little-kb/
 
 ## Port Configuration
 
-Little KB supports configurable ports for all services with automatic port availability checking. Configure ports via `config.json`:
+VectorVault supports configurable ports for all services with automatic port availability checking. Configure ports via `config.json`:
 
 ```json
 {
@@ -132,7 +140,7 @@ Use the included service management script for easy control of all services:
 
 ## MCP Integration
 
-Little KB automatically creates MCP (Model Context Protocol) servers for each knowledge base, enabling external tools like Cline to query your knowledge bases.
+VectorVault automatically creates MCP (Model Context Protocol) servers for each knowledge base, enabling external tools like Cline to query your knowledge bases.
 
 ### Features:
 - **Automatic Server Creation**: Each knowledge base gets its own MCP server
@@ -141,7 +149,7 @@ Little KB automatically creates MCP (Model Context Protocol) servers for each kn
 - **Multiple Tools**: Search, info, and document listing tools per knowledge base
 
 ### Using with Cline:
-1. Create a knowledge base in Little KB
+1. Create a knowledge base in VectorVault
 2. Go to "MCP Servers" in the web interface
 3. Click the settings icon on any server to get the Cline configuration
 4. Copy the configuration to your Cline MCP settings

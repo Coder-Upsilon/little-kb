@@ -1,4 +1,4 @@
-# Project Brief: Little KB - Knowledge Base Management Webapp
+# Project Brief: VectorVault - Knowledge Base Management Webapp
 
 ## Project Overview
 A Python-based webapp for managing multiple knowledge bases with vector storage and semantic search capabilities.

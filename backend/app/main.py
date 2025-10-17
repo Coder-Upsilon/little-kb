@@ -8,7 +8,7 @@ os.makedirs("knowledge-bases", exist_ok=True)
 os.makedirs("vector-db", exist_ok=True)
 
 app = FastAPI(
-    title="Little KB API",
+    title="VectorVault API",
     description="Knowledge Base Management System with Vector Search",
     version="1.0.0"
 )
@@ -30,7 +30,7 @@ app.include_router(mcp.router, prefix="/api/mcp", tags=["mcp"])
 
 @app.get("/")
 async def root():
-    return {"message": "Little KB API is running"}
+    return {"message": "VectorVault API is running"}
 
 @app.get("/health")
 async def health_check():

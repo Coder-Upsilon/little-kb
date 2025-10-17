@@ -1,7 +1,7 @@
 [project]
-name = "backend"
+name = "vectorvault-backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "VectorVault - Knowledge Base Management with Vector Storage"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
