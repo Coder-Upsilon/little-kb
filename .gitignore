@@ -76,3 +76,7 @@ logs/
 *.tmp
 *.temp
 temp_mcp_scripts/
+
+# Process ID files
+.backend.pid
+.frontend.pid
