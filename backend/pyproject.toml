@@ -14,4 +14,11 @@ dependencies = [
     "python-multipart>=0.0.20",
     "sentence-transformers>=5.1.1",
     "uvicorn>=0.36.0",
+    "mcp>=1.0.0",
+    "starlette>=0.41.0",
+    "anyio>=4.0.0",
+    "click>=8.0.0",
+    "ebooklib>=0.18",
+    "beautifulsoup4>=4.12.0",
+    "rank-bm25>=0.2.2",
 ]

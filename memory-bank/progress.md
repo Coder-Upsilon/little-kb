@@ -24,6 +24,7 @@ The knowledge base management webapp has been fully implemented and tested with 
 - **Search Interface**: Query input with results display and highlighting
 - **Navigation System**: Seamless routing between different views
 - **Responsive Design**: Professional UI that works across devices
+- **MCP Server Management**: Full UI for managing MCP servers with customizable tool descriptions
 
 ### Integration & Testing ✅
 - **API Integration**: Frontend successfully communicates with backend
@@ -78,7 +79,20 @@ Based on terminal logs, the application has been extensively tested:
    - Configurable result limits
    - Search statistics and status
 
-4. **User Interface**
+4. **MCP Server Integration** ✅ NEW
+   - Create and manage MCP servers for knowledge bases
+   - Support for single-KB and multi-KB servers
+   - Start/stop server controls with status monitoring
+   - Configuration generation for Cline and Claude Desktop
+   - **Editable tool descriptions**: Customize descriptions for all 3 MCP tools
+   - **Editable parameter descriptions**: Customize query and limit parameter descriptions
+   - Auto-restart servers when descriptions are updated
+   - Copy-to-clipboard for easy configuration
+   - Two-tab interface (Cline vs Claude Desktop formats)
+   - Server instructions editing with auto-restart
+   - Default server assignment per knowledge base
+
+5. **User Interface**
    - Professional Material-UI design
    - Responsive layout for different screen sizes
    - Loading states and error handling
@@ -105,6 +119,49 @@ The application is ready for use with:
 - API documentation at http://localhost:8000/docs
 - All core functionality tested and working
 
+## Latest Enhancement: MCP Tool Description Editing (December 2025)
+
+### Feature Overview
+Added comprehensive editing capabilities for MCP tool and parameter descriptions:
+- **Tool-Level Descriptions**: Edit descriptions for search_knowledge_base, get_knowledge_base_info, and list_documents
+- **Parameter Descriptions**: Edit descriptions for query and limit parameters within search_knowledge_base
+- **Dual Interface**: Available in both MCPServerManager and KnowledgeBaseDetail components
+- **Persistent Storage**: Descriptions saved in mcp_config.json with fallback to defaults
+- **Auto-Restart**: Running servers automatically restart when descriptions are updated
+
+### Implementation Details
+- **Backend**: Modified MCP service to read custom parameter descriptions, added update endpoint
+- **Frontend**: Added state management, edit/save/cancel UI pattern, dual-section display
+- **API**: New `PUT /mcp/{server_id}/tool-descriptions` endpoint for updates
+- **Storage Format**: Nested structure with `tool_descriptions.search_knowledge_base_params` for parameters
+
+### Files Modified
+- `backend/app/services/mcp_service.py` - Parameter description support in tool handlers
+- `backend/app/routers/mcp.py` - New endpoint and enhanced config response
+- `frontend/src/components/MCPServerManager.tsx` - Full editing UI implementation
+- `frontend/src/components/KnowledgeBaseDetail.tsx` - Full editing UI implementation
+
+## Recent Exploration: External URL Access Testing (January 2026)
+
+### What Was Tested
+Verified curl command-line tool functionality for accessing external documentation:
+- **Test URL**: https://developer.apple.com/tutorials/data/documentation/AVRouting.json
+- **Result**: Successfully retrieved JSON documentation data
+- **Content**: Apple's AVRouting framework documentation with full metadata
+
+### Potential Future Applications
+This testing validates the system's capability for:
+1. **URL-Based Ingestion**: Add documents directly from web URLs
+2. **Documentation Scraping**: Pull API docs from developer sites
+3. **External API Integration**: Fetch data from external sources for knowledge bases
+4. **Web Content Processing**: Process HTML/JSON content for indexing
+
+### Technical Observations
+- System has curl available and functional
+- Can access HTTPS URLs without issues
+- JSON parsing would enable structured data ingestion
+- Could complement existing file upload functionality
+
 ## Project Completion Status: 100% ✅
 
 ### Original Requirements Met
@@ -117,5 +174,6 @@ The application is ready for use with:
 - ✅ Reindexing capability
 - ✅ Query interface for data retrieval
 - ✅ Professional web application design
+- ✅ MCP server integration with full customization
 
-The Little KB knowledge base management system is now complete and fully operational!
+The Little KB knowledge base management system is now complete and fully operational with advanced MCP integration!

@@ -198,14 +198,14 @@ const FileUpload: React.FC<Props> = ({ knowledgeBaseId, onFileUploaded, onError 
           Drop files here or click to browse
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Supports: PDF, DOCX, images, and text files (max 50MB each)
+          Supports: PDF, DOCX, EPUB, images, and text files (max 500MB each)
         </Typography>
         
         <input
           id="file-input"
           type="file"
           multiple
-          accept=".pdf,.docx,.doc,.txt,.md,.py,.js,.html,.css,.json,.xml,.jpg,.jpeg,.png,.bmp,.tiff,.gif"
+          accept=".pdf,.docx,.doc,.epub,.txt,.md,.py,.js,.html,.css,.json,.xml,.jpg,.jpeg,.png,.bmp,.tiff,.gif"
           style={{ display: 'none' }}
           onChange={handleFileSelect}
         />
@@ -278,7 +278,7 @@ const FileUpload: React.FC<Props> = ({ knowledgeBaseId, onFileUploaded, onError 
           • <strong>Text:</strong> .txt, .md, .py, .js, .html, .css, .json, .xml
         </Typography>
         <Typography variant="body2" component="div">
-          • <strong>Documents:</strong> .pdf, .docx
+          • <strong>Documents:</strong> .pdf, .docx, .epub
         </Typography>
         <Typography variant="body2" component="div">
           • <strong>Images:</strong> .jpg, .jpeg, .png, .bmp, .tiff, .gif (OCR)

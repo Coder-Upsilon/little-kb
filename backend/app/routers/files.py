@@ -27,14 +27,14 @@ async def upload_file(
         if not file.filename:
             raise HTTPException(status_code=400, detail="No filename provided")
         
-        # Check file size (limit to 50MB)
-        MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
+        # Check file size (limit to 500MB)
+        MAX_FILE_SIZE = 500 * 1024 * 1024  # 500MB
         file_content = await file.read()
         
         if len(file_content) > MAX_FILE_SIZE:
             raise HTTPException(
                 status_code=413, 
-                detail="File too large. Maximum size is 50MB"
+                detail="File too large. Maximum size is 500MB"
             )
         
         if len(file_content) == 0:
@@ -47,9 +47,20 @@ async def upload_file(
             logger.error(f"Error saving file: {str(e)}")
             raise HTTPException(status_code=500, detail="Failed to save file")
         
-        # Process file
+        # Get KB config for chunking settings
+        kb_config = kb.get("config", {})
+        chunking_config = kb_config.get("chunking", {})
+        
+        # Process file with KB's chunking settings
         try:
-            result = file_processor.process_file(file_path, file.filename, kb_id)
+            result = file_processor.process_file(
+                file_path, 
+                file.filename, 
+                kb_id,
+                chunk_size=chunking_config.get("chunk_size"),
+                chunk_overlap=chunking_config.get("chunk_overlap"),
+                overlap_enabled=chunking_config.get("overlap_enabled", True)
+            )
             
             if not result["success"]:
                 # Clean up saved file if processing failed
@@ -70,7 +81,8 @@ async def upload_file(
                 chunk_count=result["chunk_count"]
             )
             
-            # Add to vector storage
+            # Add to vector storage with KB's embedding model
+            embedding_model = kb_config.get("embedding_model", "all-MiniLM-L6-v2")
             vector_data = [{
                 "document_id": result["document_id"],
                 "filename": file.filename,
@@ -78,7 +90,7 @@ async def upload_file(
                 "chunks": result["chunks"]
             }]
             
-            vector_success = vector_service.add_documents(kb_id, vector_data)
+            vector_success = vector_service.add_documents(kb_id, vector_data, embedding_model)
             
             if not vector_success:
                 # Rollback: delete document and file
@@ -186,11 +198,23 @@ async def reprocess_document(document_id: str):
         if not os.path.exists(file_path):
             raise HTTPException(status_code=404, detail="Source file not found")
         
+        # Get KB for config
+        kb = kb_service.get_knowledge_base(kb_id)
+        kb_config = kb.get("config", {}) if kb else {}
+        chunking_config = kb_config.get("chunking", {})
+        
         # Remove existing vectors
         vector_service.remove_document(kb_id, document_id)
         
-        # Reprocess file
-        result = file_processor.process_file(file_path, filename, kb_id)
+        # Reprocess file with KB's chunking settings
+        result = file_processor.process_file(
+            file_path, 
+            filename, 
+            kb_id,
+            chunk_size=chunking_config.get("chunk_size"),
+            chunk_overlap=chunking_config.get("chunk_overlap"),
+            overlap_enabled=chunking_config.get("overlap_enabled", True)
+        )
         
         if not result["success"]:
             raise HTTPException(
@@ -205,7 +229,8 @@ async def reprocess_document(document_id: str):
             data["documents"][document_id]["processed_date"] = doc["processed_date"]  # Keep original date
             kb_service.save_data(data)
         
-        # Add new vectors
+        # Add new vectors with KB's embedding model
+        embedding_model = kb_config.get("embedding_model", "all-MiniLM-L6-v2")
         vector_data = [{
             "document_id": document_id,
             "filename": filename,
@@ -213,7 +238,7 @@ async def reprocess_document(document_id: str):
             "chunks": result["chunks"]
         }]
         
-        vector_success = vector_service.add_documents(kb_id, vector_data)
+        vector_success = vector_service.add_documents(kb_id, vector_data, embedding_model)
         
         if not vector_success:
             raise HTTPException(
@@ -257,12 +282,18 @@ async def get_supported_formats():
                 "type": "docx",
                 "extensions": [".docx"],
                 "description": "Microsoft Word documents"
+            },
+            {
+                "type": "epub",
+                "extensions": [".epub"],
+                "description": "EPUB ebooks with metadata and content extraction"
             }
         ],
-        "max_file_size": "50MB",
+        "max_file_size": "500MB",
         "notes": [
             "PDF files with scanned content may not extract text properly",
             "Image OCR quality depends on image clarity and text size",
+            "EPUB files include metadata (title, author) and full content extraction",
             "Large files may take longer to process"
         ]
     }

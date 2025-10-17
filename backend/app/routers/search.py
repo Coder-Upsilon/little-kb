@@ -35,22 +35,39 @@ async def search_knowledge_base(kb_id: str, search_query: SearchQuery):
                 detail="No indexed documents found in this knowledge base"
             )
         
-        # Perform search
+        # Get KB config
+        kb_config = kb.get("config", {})
+        embedding_model = kb_config.get("embedding_model", "all-MiniLM-L6-v2")
+        search_config = kb_config.get("search", {})
+        
+        # Determine if we should use hybrid search
+        use_hybrid = search_query.use_hybrid if search_query.use_hybrid is not None else search_config.get("hybrid_search", False)
+        
+        # Perform search with KB's settings
         search_results = vector_service.search(
             kb_id=kb_id,
             query=search_query.query,
-            limit=search_query.limit
+            limit=search_query.limit,
+            embedding_model=embedding_model,
+            use_hybrid=use_hybrid,
+            hybrid_alpha=search_config.get("hybrid_alpha", 0.5),
+            bm25_k1=search_config.get("bm25_k1", 1.5),
+            bm25_b=search_config.get("bm25_b", 0.75)
         )
         
         # Convert to response format
         results = []
+        search_type = "hybrid" if use_hybrid else "vector"
+        
         for result in search_results:
             results.append(SearchResult(
                 content=result["content"],
                 filename=result["filename"],
                 file_type=result["file_type"],
                 similarity_score=result["similarity_score"],
-                chunk_index=result["chunk_index"]
+                chunk_index=result["chunk_index"],
+                bm25_score=result.get("bm25_score"),
+                hybrid_score=result.get("hybrid_score")
             ))
         
         processing_time = time.time() - start_time
@@ -59,7 +76,8 @@ async def search_knowledge_base(kb_id: str, search_query: SearchQuery):
             query=search_query.query,
             results=results,
             total_results=len(results),
-            processing_time=round(processing_time, 3)
+            processing_time=round(processing_time, 3),
+            search_type=search_type
         )
         
     except HTTPException:
@@ -128,11 +146,16 @@ async def find_similar_documents(
             # Use the first chunk as the query (could be improved)
             query_text = doc_results['documents'][0]
             
+            # Get KB config
+            kb_config = kb.get("config", {})
+            embedding_model = kb_config.get("embedding_model", "all-MiniLM-L6-v2")
+            
             # Search for similar content, excluding the source document
             search_results = vector_service.search(
                 kb_id=kb_id,
                 query=query_text,
-                limit=limit + 10  # Get extra results to filter out source document
+                limit=limit + 10,  # Get extra results to filter out source document
+                embedding_model=embedding_model
             )
             
             # Filter out chunks from the source document
@@ -228,6 +251,12 @@ async def batch_search(
         start_time = time.time()
         results = []
         
+        # Get KB config
+        kb_config = kb.get("config", {})
+        embedding_model = kb_config.get("embedding_model", "all-MiniLM-L6-v2")
+        search_config = kb_config.get("search", {})
+        use_hybrid = search_config.get("hybrid_search", False)
+        
         for query in queries:
             if not query.strip():
                 continue
@@ -235,7 +264,12 @@ async def batch_search(
             search_results = vector_service.search(
                 kb_id=kb_id,
                 query=query,
-                limit=limit
+                limit=limit,
+                embedding_model=embedding_model,
+                use_hybrid=use_hybrid,
+                hybrid_alpha=search_config.get("hybrid_alpha", 0.5),
+                bm25_k1=search_config.get("bm25_k1", 1.5),
+                bm25_b=search_config.get("bm25_b", 0.75)
             )
             
             formatted_results = []

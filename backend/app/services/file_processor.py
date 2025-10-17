@@ -7,14 +7,18 @@ from PIL import Image
 import pytesseract
 import PyPDF2
 from docx import Document
+import ebooklib
+from ebooklib import epub
+from bs4 import BeautifulSoup
 import re
 
 logger = logging.getLogger(__name__)
 
 class FileProcessor:
     def __init__(self):
-        self.chunk_size = 500  # tokens per chunk
-        self.chunk_overlap = 50  # overlap between chunks
+        # Default chunking settings (can be overridden per KB)
+        self.default_chunk_size = 500  # tokens per chunk
+        self.default_chunk_overlap = 50  # overlap between chunks
         
     def determine_file_type(self, filename: str) -> str:
         """Determine file type from filename extension"""
@@ -28,6 +32,8 @@ class FileProcessor:
             return 'image'
         elif ext in ['.docx', '.doc']:
             return 'docx'
+        elif ext == '.epub':
+            return 'epub'
         else:
             return 'text'  # Default to text
     
@@ -42,6 +48,8 @@ class FileProcessor:
                 return self._extract_text_from_image(file_path)
             elif file_type == 'docx':
                 return self._extract_text_from_docx(file_path)
+            elif file_type == 'epub':
+                return self._extract_text_from_epub(file_path)
             else:
                 logger.warning(f"Unsupported file type: {file_type}")
                 return ""
@@ -114,10 +122,66 @@ class FileProcessor:
             logger.error(f"Error reading DOCX {file_path}: {str(e)}")
             return ""
     
-    def chunk_text(self, text: str) -> List[str]:
-        """Split text into chunks for vector storage"""
+    def _extract_text_from_epub(self, file_path: str) -> str:
+        """Extract text from EPUB files"""
+        try:
+            book = epub.read_epub(file_path)
+            text = ""
+            
+            # Extract metadata
+            title = book.get_metadata('DC', 'title')
+            if title:
+                text += f"Title: {title[0][0]}\n\n"
+            
+            creator = book.get_metadata('DC', 'creator')
+            if creator:
+                text += f"Author: {creator[0][0]}\n\n"
+            
+            # Extract text from all items
+            for item in book.get_items():
+                if item.get_type() == ebooklib.ITEM_DOCUMENT:
+                    # Get the content
+                    content = item.get_content().decode('utf-8')
+                    
+                    # Parse HTML content
+                    soup = BeautifulSoup(content, 'html.parser')
+                    
+                    # Remove script and style elements
+                    for script in soup(["script", "style"]):
+                        script.decompose()
+                    
+                    # Get text and clean it up
+                    chapter_text = soup.get_text()
+                    
+                    # Clean up whitespace
+                    lines = (line.strip() for line in chapter_text.splitlines())
+                    chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+                    chapter_text = ' '.join(chunk for chunk in chunks if chunk)
+                    
+                    if chapter_text.strip():
+                        text += chapter_text + "\n\n"
+            
+            return text
+        except Exception as e:
+            logger.error(f"Error reading EPUB {file_path}: {str(e)}")
+            return ""
+    
+    def chunk_text(self, text: str, chunk_size: int = None, 
+                   chunk_overlap: int = None, overlap_enabled: bool = True) -> List[str]:
+        """Split text into chunks for vector storage
+        
+        Args:
+            text: Text to chunk
+            chunk_size: Size of chunks in tokens (uses default if None)
+            chunk_overlap: Overlap between chunks in tokens (uses default if None)
+            overlap_enabled: Whether to use overlapping chunks
+        """
         if not text.strip():
             return []
+        
+        # Use provided values or defaults
+        chunk_size = chunk_size or self.default_chunk_size
+        chunk_overlap = chunk_overlap or self.default_chunk_overlap
         
         # Simple sentence-based chunking
         sentences = re.split(r'[.!?]+', text)
@@ -133,13 +197,24 @@ class FileProcessor:
             sentence_tokens = len(sentence.split()) * 1.3
             current_tokens = len(current_chunk.split()) * 1.3
             
-            if current_tokens + sentence_tokens > self.chunk_size and current_chunk:
-                # Add current chunk and start new one with overlap
+            if current_tokens + sentence_tokens > chunk_size and current_chunk:
+                # Add current chunk
                 chunks.append(current_chunk.strip())
                 
-                # Create overlap by keeping last few sentences
-                overlap_sentences = current_chunk.split('.')[-2:]  # Keep last 2 sentences
-                current_chunk = '. '.join(overlap_sentences) + '. ' + sentence
+                if overlap_enabled and chunk_overlap > 0:
+                    # Create overlap by keeping last portion of current chunk
+                    words = current_chunk.split()
+                    overlap_words = int(chunk_overlap / 1.3)  # Convert tokens to words
+                    overlap_words = min(overlap_words, len(words))
+                    
+                    if overlap_words > 0:
+                        overlap_text = ' '.join(words[-overlap_words:])
+                        current_chunk = overlap_text + ' ' + sentence + '. '
+                    else:
+                        current_chunk = sentence + '. '
+                else:
+                    # No overlap, start fresh
+                    current_chunk = sentence + '. '
             else:
                 current_chunk += sentence + '. '
         
@@ -147,13 +222,24 @@ class FileProcessor:
         if current_chunk.strip():
             chunks.append(current_chunk.strip())
         
-        # Filter out very short chunks
+        # Filter out very short chunks (at least 10 words)
         chunks = [chunk for chunk in chunks if len(chunk.split()) > 10]
         
         return chunks
     
-    def process_file(self, file_path: str, filename: str, kb_id: str) -> Dict[str, Any]:
-        """Process a file and return document data for vector storage"""
+    def process_file(self, file_path: str, filename: str, kb_id: str,
+                    chunk_size: int = None, chunk_overlap: int = None,
+                    overlap_enabled: bool = True) -> Dict[str, Any]:
+        """Process a file and return document data for vector storage
+        
+        Args:
+            file_path: Path to the file
+            filename: Name of the file
+            kb_id: Knowledge base ID
+            chunk_size: Size of chunks in tokens (uses default if None)
+            chunk_overlap: Overlap between chunks in tokens (uses default if None)
+            overlap_enabled: Whether to use overlapping chunks
+        """
         try:
             # Determine file type
             file_type = self.determine_file_type(filename)
@@ -168,8 +254,8 @@ class FileProcessor:
                     "error": "No text content found in file"
                 }
             
-            # Chunk text
-            chunks = self.chunk_text(text)
+            # Chunk text with custom settings
+            chunks = self.chunk_text(text, chunk_size, chunk_overlap, overlap_enabled)
             
             if not chunks:
                 logger.warning(f"No chunks created from {filename}")
@@ -205,8 +291,8 @@ class FileProcessor:
     def save_file(self, file_content: bytes, filename: str, kb_id: str) -> str:
         """Save uploaded file to knowledge base directory"""
         try:
-            # Create knowledge base directory
-            kb_dir = Path(f"../knowledge-bases/{kb_id}")
+            # Create knowledge base directory - use absolute path from current working directory
+            kb_dir = Path(f"knowledge-bases/{kb_id}")
             kb_dir.mkdir(parents=True, exist_ok=True)
             
             # Generate unique filename to avoid conflicts

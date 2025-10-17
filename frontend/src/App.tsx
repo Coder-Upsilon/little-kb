@@ -23,20 +23,19 @@ import {
 import {
   Add as AddIcon,
   Folder as FolderIcon,
-  Search as SearchIcon,
-  Upload as UploadIcon,
   Delete as DeleteIcon,
   Refresh as RefreshIcon,
+  Settings as SettingsIcon,
 } from '@mui/icons-material';
-import { knowledgeBaseApi, filesApi, searchApi, KnowledgeBase, Document, SearchResponse } from './services/api';
+import { knowledgeBaseApi, KnowledgeBase } from './services/api';
 import KnowledgeBaseDetail from './components/KnowledgeBaseDetail';
-import SearchInterface from './components/SearchInterface';
-import FileUpload from './components/FileUpload';
+import DocumentsList from './components/DocumentsList';
+import MCPServerManager from './components/MCPServerManager';
 
 function App() {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([]);
   const [selectedKB, setSelectedKB] = useState<KnowledgeBase | null>(null);
-  const [currentView, setCurrentView] = useState<'list' | 'detail' | 'search'>('list');
+  const [currentView, setCurrentView] = useState<'list' | 'detail' | 'documents' | 'mcp'>('list');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -145,7 +144,18 @@ function App() {
               gap={3}
             >
               {knowledgeBases.map((kb) => (
-                <Card key={kb.id}>
+                <Card 
+                  key={kb.id}
+                  sx={{ 
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: 4
+                    }
+                  }}
+                  onClick={() => handleSelectKB(kb)}
+                >
                   <CardContent>
                     <Box display="flex" alignItems="center" mb={1}>
                       <FolderIcon color="primary" sx={{ mr: 1 }} />
@@ -174,26 +184,12 @@ function App() {
                   </CardContent>
                   
                   <CardActions>
-                    <Button 
-                      size="small" 
-                      onClick={() => handleSelectKB(kb)}
-                      startIcon={<FolderIcon />}
-                    >
-                      Open
-                    </Button>
-                    <Button 
-                      size="small" 
-                      onClick={() => {
-                        setSelectedKB(kb);
-                        setCurrentView('search');
-                      }}
-                      startIcon={<SearchIcon />}
-                    >
-                      Search
-                    </Button>
                     <IconButton 
                       size="small" 
-                      onClick={() => handleDeleteKB(kb)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteKB(kb);
+                      }}
                       color="error"
                     >
                       <DeleteIcon />
@@ -277,6 +273,13 @@ function App() {
               Back to List
             </Button>
           )}
+          <Button 
+            color="inherit" 
+            startIcon={<SettingsIcon />}
+            onClick={() => setCurrentView('mcp')}
+          >
+            MCP Servers
+          </Button>
           <IconButton color="inherit" onClick={loadKnowledgeBases}>
             <RefreshIcon />
           </IconButton>
@@ -287,20 +290,42 @@ function App() {
       
       {currentView === 'detail' && selectedKB && (
         <KnowledgeBaseDetail 
-          knowledgeBase={selectedKB} 
+          knowledgeBase={selectedKB}
+          allKnowledgeBases={knowledgeBases}
           onBack={handleBackToList}
+          onNavigateToDocuments={() => setCurrentView('documents')}
           onKBUpdated={(updatedKB) => {
             setKnowledgeBases(kbs => kbs.map(kb => kb.id === updatedKB.id ? updatedKB : kb));
             setSelectedKB(updatedKB);
           }}
+          onKBSelected={(kb) => {
+            setSelectedKB(kb);
+            // Stay on detail view but switch to the new KB
+          }}
         />
       )}
       
-      {currentView === 'search' && selectedKB && (
-        <SearchInterface 
-          knowledgeBase={selectedKB} 
-          onBack={handleBackToList}
+      {currentView === 'documents' && selectedKB && (
+        <DocumentsList 
+          knowledgeBase={selectedKB}
+          allKnowledgeBases={knowledgeBases}
+          onBack={() => setCurrentView('detail')}
+          onKBUpdated={(updatedKB) => {
+            setKnowledgeBases(kbs => kbs.map(kb => kb.id === updatedKB.id ? updatedKB : kb));
+            setSelectedKB(updatedKB);
+          }}
+          onKBSelected={(kb) => {
+            setSelectedKB(kb);
+            setCurrentView('detail'); // Navigate back to detail view when switching KBs
+          }}
         />
+      )}
+      
+      
+      {currentView === 'mcp' && (
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+          <MCPServerManager />
+        </Container>
       )}
     </Box>
   );

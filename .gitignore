@@ -75,3 +75,4 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+temp_mcp_scripts/

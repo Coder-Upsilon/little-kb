@@ -9,16 +9,11 @@ import {
   CardContent,
   List,
   ListItem,
-  ListItemText,
   Chip,
   Alert,
   CircularProgress,
   InputAdornment,
   Slider,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Divider,
 } from '@mui/material';
 import {
@@ -31,9 +26,10 @@ import { searchApi, KnowledgeBase, SearchResponse, SearchResult } from '../servi
 interface Props {
   knowledgeBase: KnowledgeBase;
   onBack: () => void;
+  embedded?: boolean;
 }
 
-const SearchInterface: React.FC<Props> = ({ knowledgeBase, onBack }) => {
+const SearchInterface: React.FC<Props> = ({ knowledgeBase, onBack, embedded = false }) => {
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -105,7 +101,9 @@ const SearchInterface: React.FC<Props> = ({ knowledgeBase, onBack }) => {
     let highlightedText = text;
     
     words.forEach(word => {
-      const regex = new RegExp(`(${word})`, 'gi');
+      // Escape special regex characters
+      const escapedWord = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedWord})`, 'gi');
       highlightedText = highlightedText.replace(regex, '<mark>$1</mark>');
     });
     
@@ -114,54 +112,58 @@ const SearchInterface: React.FC<Props> = ({ knowledgeBase, onBack }) => {
 
   return (
     <Container maxWidth="lg">
-      <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Search in {knowledgeBase.name}
-        </Typography>
+      <Box sx={{ mt: embedded ? 0 : 4, mb: embedded ? 0 : 4 }}>
+        {!embedded && (
+          <>
+            <Typography variant="h4" component="h1" gutterBottom>
+              Search in {knowledgeBase.name}
+            </Typography>
 
-        {knowledgeBase.description && (
-          <Typography variant="body1" color="text.secondary" paragraph>
-            {knowledgeBase.description}
-          </Typography>
-        )}
-
-        {/* Search Stats */}
-        {searchStats && (
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Search Statistics
+            {knowledgeBase.description && (
+              <Typography variant="body1" color="text.secondary" paragraph>
+                {knowledgeBase.description}
               </Typography>
-              <Box display="flex" gap={4} flexWrap="wrap">
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Documents
+            )}
+
+            {/* Search Stats */}
+            {searchStats && (
+              <Card sx={{ mb: 3 }}>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Search Statistics
                   </Typography>
-                  <Typography variant="h6">
-                    {searchStats.total_documents || 0}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Searchable Chunks
-                  </Typography>
-                  <Typography variant="h6">
-                    {searchStats.total_chunks || 0}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Status
-                  </Typography>
-                  <Chip
-                    label={searchStats.searchable ? 'Ready' : 'Not Ready'}
-                    color={searchStats.searchable ? 'success' : 'error'}
-                    size="small"
-                  />
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
+                  <Box display="flex" gap={4} flexWrap="wrap">
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Total Documents
+                      </Typography>
+                      <Typography variant="h6">
+                        {searchStats.total_documents || 0}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Searchable Chunks
+                      </Typography>
+                      <Typography variant="h6">
+                        {searchStats.total_chunks || 0}
+                      </Typography>
+                    </Box>
+                    <Box>
+                      <Typography variant="body2" color="text.secondary">
+                        Status
+                      </Typography>
+                      <Chip
+                        label={searchStats.searchable ? 'Ready' : 'Not Ready'}
+                        color={searchStats.searchable ? 'success' : 'error'}
+                        size="small"
+                      />
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            )}
+          </>
         )}
 
         {error && (

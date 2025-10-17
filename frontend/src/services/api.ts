@@ -10,17 +10,46 @@ const api = axios.create({
 });
 
 // Knowledge Base Types
+export interface ChunkingConfig {
+  chunk_size: number;
+  chunk_overlap: number;
+  overlap_enabled: boolean;
+}
+
+export interface SearchConfig {
+  hybrid_search: boolean;
+  hybrid_alpha: number;
+  bm25_k1: number;
+  bm25_b: number;
+}
+
+export interface KnowledgeBaseConfig {
+  embedding_model: string;
+  chunking: ChunkingConfig;
+  search: SearchConfig;
+}
+
+export interface EmbeddingModel {
+  id: string;
+  name: string;
+  dimensions: number;
+  size_mb: number;
+  description: string;
+}
+
 export interface KnowledgeBase {
   id: string;
   name: string;
   description?: string;
   created_date: string;
   file_count: number;
+  config?: KnowledgeBaseConfig;
 }
 
 export interface KnowledgeBaseCreate {
   name: string;
   description?: string;
+  config?: KnowledgeBaseConfig;
 }
 
 export interface Document {
@@ -95,6 +124,30 @@ export const knowledgeBaseApi = {
   // Reindex a knowledge base
   reindex: async (id: string): Promise<any> => {
     const response = await api.post(`/knowledge-bases/${id}/reindex`);
+    return response.data;
+  },
+
+  // Get knowledge base configuration
+  getConfig: async (id: string): Promise<KnowledgeBaseConfig> => {
+    const response = await api.get(`/knowledge-bases/${id}/config`);
+    return response.data;
+  },
+
+  // Update knowledge base configuration
+  updateConfig: async (id: string, config: KnowledgeBaseConfig): Promise<any> => {
+    const response = await api.put(`/knowledge-bases/${id}/config`, config);
+    return response.data;
+  },
+
+  // Get available embedding models
+  getEmbeddingModels: async (): Promise<EmbeddingModel[]> => {
+    const response = await api.get('/knowledge-bases/config/embedding-models');
+    return response.data.models;
+  },
+
+  // Get reindex progress
+  getReindexProgress: async (id: string): Promise<any> => {
+    const response = await api.get(`/knowledge-bases/${id}/reindex/progress`);
     return response.data;
   },
 };
