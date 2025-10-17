@@ -1,4 +1,4 @@
-# Product Context: VectorVault
+# Product Context: Little KB
 
 ## Problem Statement
 Managing multiple knowledge bases with different types of documents (text, PDFs, images, Word docs) is challenging without proper organization and search capabilities. Additionally, integrating these knowledge bases with AI tools requires complex setup. Users need a way to:

@@ -2,6 +2,7 @@
   "name": "little-kb-frontend",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "description": "Vector Storage & MCP Management Platform - Frontend",
   "dependencies": {
     "@emotion/react": "^11.14.0",

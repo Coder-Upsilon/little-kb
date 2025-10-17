@@ -1,4 +1,4 @@
-# Project Brief: VectorVault - Vector Storage & MCP Management Platform
+# Project Brief: Little KB - Vector Storage & MCP Management Platform
 
 ## Project Overview
 A powerful web application for creating vector-indexed knowledge bases with automatic MCP server generation for seamless integration with AI tools like Cline.

@@ -1,14 +1,14 @@
 {
   "backend": {
-    "port": 8000,
-    "host": "0.0.0.0"
+    "port": 39472,
+    "host": "127.0.0.1"
   },
   "frontend": {
-    "port": 3000
+    "port": 39473
   },
   "mcp": {
-    "start_port": 8100,
-    "max_port": 8200
+    "start_port": 39500,
+    "max_port": 39600
   },
   "embedding": {
     "available_models": [

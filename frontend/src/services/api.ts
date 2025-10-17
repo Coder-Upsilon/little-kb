@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// Dynamic API base URL - will be set based on environment (Electron vs Web)
+let API_BASE_URL = 'http://localhost:8000/api';
+let apiInitialized = false;
+let initPromise: Promise<void> | null = null;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -8,6 +11,33 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Initialize API with dynamic backend URL for Electron
+export async function initializeAPI(): Promise<void> {
+  if (apiInitialized) return;
+  if (initPromise) return initPromise;
+  
+  initPromise = (async () => {
+    if (window.electronAPI) {
+      try {
+        const backendUrl = await window.electronAPI.getBackendUrl();
+        API_BASE_URL = `${backendUrl}/api`;
+        api.defaults.baseURL = API_BASE_URL;
+        console.log(`API initialized with Electron backend: ${API_BASE_URL}`);
+      } catch (error) {
+        console.error('Failed to get backend URL from Electron:', error);
+      }
+    } else {
+      console.log(`API initialized with default backend: ${API_BASE_URL}`);
+    }
+    apiInitialized = true;
+  })();
+  
+  return initPromise;
+}
+
+// Start initialization immediately
+initializeAPI();
 
 // Knowledge Base Types
 export interface ChunkingConfig {

@@ -808,10 +808,10 @@ class MCPServerManager:
             # Create the Starlette app
             app = mcp_server.create_starlette_app()
             
-            # Create uvicorn config
+            # Create uvicorn config - use 127.0.0.1 for security
             config = uvicorn.Config(
                 app=app,
-                host="0.0.0.0",
+                host="127.0.0.1",
                 port=server_config["port"],
                 log_level="info"
             )

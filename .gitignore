@@ -1,3 +1,16 @@
+# Electron
+dist/
+out/
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+*.exe
+*.msi
+build/release/
+node_modules/
+package-lock.json
+
 # Python
 __pycache__/
 *.py[cod]

@@ -31,6 +31,7 @@ import { knowledgeBaseApi, KnowledgeBase } from './services/api';
 import KnowledgeBaseDetail from './components/KnowledgeBaseDetail';
 import DocumentsList from './components/DocumentsList';
 import MCPServerManager from './components/MCPServerManager';
+import LoadingScreen from './components/LoadingScreen';
 
 function App() {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>([]);
@@ -39,6 +40,10 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Initialization progress state
+  const [isInitializing, setIsInitializing] = useState(true);
+  const [initProgress, setInitProgress] = useState({ percent: 0, message: 'Starting...' });
+  
   // Dialog states
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [newKBName, setNewKBName] = useState('');
@@ -46,8 +51,39 @@ function App() {
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    loadKnowledgeBases();
+    // Listen for initialization progress from Electron
+    if (window.electronAPI) {
+      window.electronAPI.onInitializationProgress((data) => {
+        setInitProgress(data);
+        if (data.percent === 100) {
+          // Backend is ready, now initialize API and load data
+          initializeAndLoad();
+        }
+      });
+    } else {
+      // Not in Electron, skip loading screen and init immediately
+      setIsInitializing(false);
+      initializeAndLoad();
+    }
   }, []);
+
+  const initializeAndLoad = async () => {
+    try {
+      // Wait for API to initialize with correct backend URL
+      const { initializeAPI } = await import('./services/api');
+      await initializeAPI();
+      
+      // Now load knowledge bases
+      await loadKnowledgeBases();
+      
+      // Hide loading screen after a brief delay
+      setTimeout(() => setIsInitializing(false), 500);
+    } catch (error) {
+      console.error('Initialization error:', error);
+      setError('Failed to initialize application');
+      setIsInitializing(false);
+    }
+  };
 
   const loadKnowledgeBases = async () => {
     try {
@@ -260,6 +296,11 @@ function App() {
       </Dialog>
     </Container>
   );
+
+  // Show loading screen during initialization
+  if (isInitializing) {
+    return <LoadingScreen percent={initProgress.percent} message={initProgress.message} />;
+  }
 
   return (
     <Box sx={{ flexGrow: 1 }}>
