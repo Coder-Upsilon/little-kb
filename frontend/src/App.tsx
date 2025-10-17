@@ -122,9 +122,9 @@ function App() {
   const renderKnowledgeBaseList = () => (
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Knowledge Bases
-        </Typography>
+          <Typography variant="h4" component="h1" gutterBottom>
+            little-kb - Knowledge Base Manager
+          </Typography>
         
         {error && (
           <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
@@ -266,7 +266,7 @@ function App() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            VectorVault - Knowledge Base Manager
+            little-kb - Knowledge Base Manager
           </Typography>
           {currentView !== 'list' && (
             <Button color="inherit" onClick={handleBackToList}>

@@ -39,49 +39,6 @@ wheels = [
 ]
 
 [[package]]
-name = "backend"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "anyio" },
-    { name = "beautifulsoup4" },
-    { name = "chromadb" },
-    { name = "click" },
-    { name = "ebooklib" },
-    { name = "fastapi" },
-    { name = "mcp" },
-    { name = "pillow" },
-    { name = "pypdf2" },
-    { name = "pytesseract" },
-    { name = "python-docx" },
-    { name = "python-multipart" },
-    { name = "rank-bm25" },
-    { name = "sentence-transformers" },
-    { name = "starlette" },
-    { name = "uvicorn" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "anyio", specifier = ">=4.0.0" },
-    { name = "beautifulsoup4", specifier = ">=4.12.0" },
-    { name = "chromadb", specifier = ">=1.1.0" },
-    { name = "click", specifier = ">=8.0.0" },
-    { name = "ebooklib", specifier = ">=0.18" },
-    { name = "fastapi", specifier = ">=0.117.1" },
-    { name = "mcp", specifier = ">=1.0.0" },
-    { name = "pillow", specifier = ">=11.3.0" },
-    { name = "pypdf2", specifier = ">=3.0.1" },
-    { name = "pytesseract", specifier = ">=0.3.13" },
-    { name = "python-docx", specifier = ">=1.2.0" },
-    { name = "python-multipart", specifier = ">=0.0.20" },
-    { name = "rank-bm25", specifier = ">=0.2.2" },
-    { name = "sentence-transformers", specifier = ">=5.1.1" },
-    { name = "starlette", specifier = ">=0.41.0" },
-    { name = "uvicorn", specifier = ">=0.36.0" },
-]
-
-[[package]]
 name = "backoff"
 version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -643,6 +600,49 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ae/52/19ebe8004c243fdfa78268a96727c71e08f00ff6fe69a301d0b7fcbce3c2/kubernetes-33.1.0.tar.gz", hash = "sha256:f64d829843a54c251061a8e7a14523b521f2dc5c896cf6d65ccf348648a88993", size = 1036779, upload-time = "2025-06-09T21:57:58.521Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/89/43/d9bebfc3db7dea6ec80df5cb2aad8d274dd18ec2edd6c4f21f32c237cbbb/kubernetes-33.1.0-py2.py3-none-any.whl", hash = "sha256:544de42b24b64287f7e0aa9513c93cb503f7f40eea39b20f66810011a86eabc5", size = 1941335, upload-time = "2025-06-09T21:57:56.327Z" },
+]
+
+[[package]]
+name = "little-kb-backend"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "anyio" },
+    { name = "beautifulsoup4" },
+    { name = "chromadb" },
+    { name = "click" },
+    { name = "ebooklib" },
+    { name = "fastapi" },
+    { name = "mcp" },
+    { name = "pillow" },
+    { name = "pypdf2" },
+    { name = "pytesseract" },
+    { name = "python-docx" },
+    { name = "python-multipart" },
+    { name = "rank-bm25" },
+    { name = "sentence-transformers" },
+    { name = "starlette" },
+    { name = "uvicorn" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "anyio", specifier = ">=4.0.0" },
+    { name = "beautifulsoup4", specifier = ">=4.12.0" },
+    { name = "chromadb", specifier = ">=1.1.0" },
+    { name = "click", specifier = ">=8.0.0" },
+    { name = "ebooklib", specifier = ">=0.18" },
+    { name = "fastapi", specifier = ">=0.117.1" },
+    { name = "mcp", specifier = ">=1.0.0" },
+    { name = "pillow", specifier = ">=11.3.0" },
+    { name = "pypdf2", specifier = ">=3.0.1" },
+    { name = "pytesseract", specifier = ">=0.3.13" },
+    { name = "python-docx", specifier = ">=1.2.0" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
+    { name = "rank-bm25", specifier = ">=0.2.2" },
+    { name = "sentence-transformers", specifier = ">=5.1.1" },
+    { name = "starlette", specifier = ">=0.41.0" },
+    { name = "uvicorn", specifier = ">=0.36.0" },
 ]
 
 [[package]]

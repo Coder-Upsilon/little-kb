@@ -1,7 +1,7 @@
 [project]
-name = "vectorvault-backend"
+name = "little-kb-backend"
 version = "0.1.0"
-description = "VectorVault - Vector Storage & MCP Management Platform"
+description = "little-kb - Vector Storage & MCP Management Platform"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

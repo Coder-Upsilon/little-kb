@@ -1,4 +1,4 @@
-# VectorVault - Vector Storage & MCP Management Platform
+# little-kb - Vector Storage & MCP Management Platform
 
 A powerful web application for creating vector-indexed knowledge bases with automatic MCP server generation for seamless integration with AI tools like Cline.
 
@@ -24,8 +24,8 @@ A powerful web application for creating vector-indexed knowledge bases with auto
 
 Clone the repository:
 ```bash
-git clone https://github.com/Coder-Upsilon/VectorVault.git
-cd VectorVault
+git clone https://github.com/Coder-Upsilon/little-kb.git
+cd little-kb
 ```
 
 ## Quick Start
@@ -52,7 +52,7 @@ The application will be available at:
 ## Project Structure
 
 ```
-VectorVault/
+little-kb/
 ├── backend/           # FastAPI backend
 │   ├── app/
 │   │   ├── models/    # Pydantic schemas
@@ -69,7 +69,7 @@ VectorVault/
 
 ## Port Configuration
 
-VectorVault supports configurable ports for all services with automatic port availability checking. Configure ports via `config.json`:
+little-kb supports configurable ports for all services with automatic port availability checking. Configure ports via `config.json`:
 
 ```json
 {
@@ -140,7 +140,7 @@ Use the included service management script for easy control of all services:
 
 ## MCP Integration
 
-VectorVault automatically creates MCP (Model Context Protocol) servers for each knowledge base, enabling external tools like Cline to query your knowledge bases.
+little-kb automatically creates MCP (Model Context Protocol) servers for each knowledge base, enabling external tools like Cline to query your knowledge bases.
 
 ### Features:
 - **Automatic Server Creation**: Each knowledge base gets its own MCP server
@@ -149,7 +149,7 @@ VectorVault automatically creates MCP (Model Context Protocol) servers for each 
 - **Multiple Tools**: Search, info, and document listing tools per knowledge base
 
 ### Using with Cline:
-1. Create a knowledge base in VectorVault
+1. Create a knowledge base in little-kb
 2. Go to "MCP Servers" in the web interface
 3. Click the settings icon on any server to get the Cline configuration
 4. Copy the configuration to your Cline MCP settings
